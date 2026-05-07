@@ -5,7 +5,7 @@
 #define MAP_SIZE 21
 using namespace std;
 
-vector<pair<int, int>> place_snake(int (*original_map_data)[MAP_SIZE]);
+vector<pair<int, int>> place_snake();
 void set_color();
 void move_snake(vector<pair<int, int>>& snake_pos, int userInput, int length);
 void fill_board(WINDOW* win, vector<pair<int, int>>& snake_pos, int length);
@@ -53,9 +53,7 @@ int main()
     refresh();
 
     gameboard = newwin(MAP_SIZE, MAP_SIZE, 0, 0);
-    snake_pos = place_snake(original_map_data);
-
-
+    snake_pos = place_snake();
     
     do
     {
@@ -72,7 +70,7 @@ int main()
     return 0;
 }
 
-vector<pair<int, int>> place_snake(int (*original_map_data)[MAP_SIZE])
+vector<pair<int, int>> place_snake()
 {
     // int startpos_x, startpos_y;
     // vector<pair<int, int>> snake_pos;
@@ -97,7 +95,10 @@ vector<pair<int, int>> place_snake(int (*original_map_data)[MAP_SIZE])
     // wbkgd(gameboard, '0');
 
     // wrefresh(gameboard);
+
     int map_data[MAP_SIZE][MAP_SIZE];
+
+    // 원본 맵 복사
     for (int i = 0; i < MAP_SIZE; i++)
     {
         for (int j = 0; j < MAP_SIZE; j++)
@@ -174,20 +175,83 @@ void move_snake(vector<pair<int, int>>& snake_pos, int userInput, int length)
     }
 }
 
-void fill_board(WINDOW* gameboard, vector<pair<int, int>>& snake_pos, int length)
+void fill_board(WINDOW* gameboard,
+                vector<pair<int, int>>& snake_pos,
+                int length)
 {
-    wclear(gameboard);
-    wattron(gameboard, COLOR_PAIR(1));
-    mvwprintw(gameboard, snake_pos[0].first, snake_pos[0].second, "3");
-    wattron(gameboard, COLOR_PAIR(2));
+    int map_data[MAP_SIZE][MAP_SIZE];
+
+    // 원본 맵 복사
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        for (int j = 0; j < MAP_SIZE; j++)
+        {
+            map_data[i][j] = original_map_data[i][j];
+        }
+    }
+
+    // snake 위치 반영
+    map_data[snake_pos[0].first][snake_pos[0].second] = 3;
+
     for (int i = 1; i < length; i++)
     {
-        mvwprintw(gameboard, snake_pos[i].first, snake_pos[i].second, "4");
+        map_data[snake_pos[i].first][snake_pos[i].second] = 4;
     }
-    wattroff(gameboard, COLOR_PAIR(2));
 
-    wborder(gameboard, '1', '1', '1', '1', '2','2','2','2');
-    // wbkgd(gameboard, '0');
+    // 화면 지우기
+    wclear(gameboard);
+
+    // 전체 맵 출력
+    for (int i = 0; i < MAP_SIZE; i++)
+    {
+        for (int j = 0; j < MAP_SIZE; j++)
+        {
+            switch(map_data[i][j])
+            {
+                case 0:
+                    mvwprintw(gameboard, i, j, " ");
+                    break;
+
+                case 1:
+                    mvwprintw(gameboard, i, j, "#");
+                    break;
+
+                case 2:
+                    mvwprintw(gameboard, i, j, "+");
+                    break;
+
+                case 3:
+                    wattron(gameboard, COLOR_PAIR(1));
+                    mvwprintw(gameboard, i, j, " ");
+                    wattroff(gameboard, COLOR_PAIR(1));
+                    break;
+
+                case 4:
+                    wattron(gameboard, COLOR_PAIR(2));
+                    mvwprintw(gameboard, i, j, " ");
+                    wattroff(gameboard, COLOR_PAIR(2));
+                    break;
+            }
+        }
+    }
 
     wrefresh(gameboard);
 }
+
+// void fill_board(WINDOW* gameboard, vector<pair<int, int>>& snake_pos, int length)
+// {
+//     wclear(gameboard);
+//     wattron(gameboard, COLOR_PAIR(1));
+//     mvwprintw(gameboard, snake_pos[0].first, snake_pos[0].second, "3");
+//     wattron(gameboard, COLOR_PAIR(2));
+//     for (int i = 1; i < length; i++)
+//     {
+//         mvwprintw(gameboard, snake_pos[i].first, snake_pos[i].second, "4");
+//     }
+//     wattroff(gameboard, COLOR_PAIR(2));
+
+//     wborder(gameboard, '1', '1', '1', '1', '2','2','2','2');
+//     // wbkgd(gameboard, '0');
+
+//     wrefresh(gameboard);
+// }
