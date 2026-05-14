@@ -8,7 +8,7 @@
 
 using namespace std;
 
-vector<pair<int, int>> place_snake();
+vector<pair<int, int>> place_snake(int& dirY, int& dirX);
 
 void process_input(int userInput, int& dirY, int& dirX);
 
