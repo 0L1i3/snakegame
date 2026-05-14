@@ -7,131 +7,196 @@
 
 using namespace std;
 
-vector<pair<int, int>> place_snake() {
+vector<pair<int, int>> place_snake(int& dirY, int& dirX)
+{
     vector<pair<int, int>> snake_pos;
-
-    srand(time(0));
 
     int y;
     int x;
 
-        while (true)
-        {
-            y = rand() % (MAP_SIZE - 2) + 1;
-            x = rand() % (MAP_SIZE - 4) + 3;
+    int direction = rand() % 4;
 
-            // 몸 3칸이 모두 빈칸인지 검사
-            if (original_map_data[y][x] == 0 &&
-                original_map_data[y][x - 1] == 0 &&
-                original_map_data[y][x - 2] == 0)
-            {
-                break;
-            }
-        }
-
-        // 머리
-        snake_pos.push_back({y, x});
-
-        // 몸통
-        snake_pos.push_back({y, x - 1});
-        snake_pos.push_back({y, x - 2});
-
-        return snake_pos;
-    }
-
-    void process_input(int userInput, int& dirY, int& dirX)
+    while (true)
     {
-        switch(userInput)
+        y = rand() % (MAP_SIZE - 6) + 3;
+        x = rand() % (MAP_SIZE - 6) + 3;
+
+        bool possible = true;
+
+        switch(direction)
         {
-            case 'w':
-            case KEY_UP:
-
-                if (dirY != 1)
+            case 0:
+                for (int i = 0; i < 3; i++)
                 {
-                    dirY = -1;
-                    dirX = 0;
+                    if (original_map_data[y][x - i] != 0)
+                        possible = false;
                 }
-
                 break;
 
-            case 's':
-            case KEY_DOWN:
-
-                if (dirY != -1)
+            case 1:
+                for (int i = 0; i < 3; i++)
                 {
-                    dirY = 1;
-                    dirX = 0;
+                    if (original_map_data[y][x + i] != 0)
+                        possible = false;
                 }
-
                 break;
 
-            case 'a':
-            case KEY_LEFT:
-
-                if (dirX != 1)
+            case 2:
+                for (int i = 0; i < 3; i++)
                 {
-                    dirY = 0;
-                    dirX = -1;
+                    if (original_map_data[y - i][x] != 0)
+                        possible = false;
                 }
-
                 break;
 
-            case 'd':
-            case KEY_RIGHT:
-
-                if (dirX != -1)
+            case 3:
+                for (int i = 0; i < 3; i++)
                 {
-                    dirY = 0;
-                    dirX = 1;
+                    if (original_map_data[y + i][x] != 0)
+                        possible = false;
                 }
-
                 break;
         }
+
+        if (possible)
+            break;
     }
 
-    void move_snake(vector<pair<int, int>>& snake_pos,
-                    vector<Item>& items,
-                    int& dirY,
-                    int& dirX)
+    switch(direction)
     {
-        int newY = snake_pos[0].first + dirY;
+        case 0:
+            dirY = 0;
+            dirX = 1;
 
-        int newX = snake_pos[0].second + dirX;
+            snake_pos.push_back({y, x});
+            snake_pos.push_back({y, x - 1});
+            snake_pos.push_back({y, x - 2});
+            break;
 
-        bool grow = false;
+        case 1:
+            dirY = 0;
+            dirX = -1;
 
-        bool poison = false;
+            snake_pos.push_back({y, x});
+            snake_pos.push_back({y, x + 1});
+            snake_pos.push_back({y, x + 2});
+            break;
 
-        for (int i = 0; i < items.size(); i++)
-        {
-            if (items[i].y == newY &&
-                items[i].x == newX)
+        case 2:
+            dirY = 1;
+            dirX = 0;
+
+            snake_pos.push_back({y, x});
+            snake_pos.push_back({y - 1, x});
+            snake_pos.push_back({y - 2, x});
+            break;
+
+        case 3:
+            dirY = -1;
+            dirX = 0;
+
+            snake_pos.push_back({y, x});
+            snake_pos.push_back({y + 1, x});
+            snake_pos.push_back({y + 2, x});
+            break;
+    }
+
+    return snake_pos;
+}
+
+void process_input(int userInput, int& dirY, int& dirX)
+{
+    switch(userInput)
+    {
+        case 'w':
+        case KEY_UP:
+
+            if (dirY != 1)
             {
-                if (items[i].type == GROWTH_ITEM)
-                {
-                    grow = true;
-                }
-
-                else if (items[i].type == POISON_ITEM)
-                {
-                    poison = true;
-                }
-
-                items.erase(items.begin() + i);
-
-                break;
+                dirY = -1;
+                dirX = 0;
             }
-        }
 
-        snake_pos.insert(snake_pos.begin(), {newY, newX});
+            break;
 
-        if (!grow)
+        case 's':
+        case KEY_DOWN:
+
+            if (dirY != -1)
+            {
+                dirY = 1;
+                dirX = 0;
+            }
+
+            break;
+
+        case 'a':
+        case KEY_LEFT:
+
+            if (dirX != 1)
+            {
+                dirY = 0;
+                dirX = -1;
+            }
+
+            break;
+
+        case 'd':
+        case KEY_RIGHT:
+
+            if (dirX != -1)
+            {
+                dirY = 0;
+                dirX = 1;
+            }
+
+            break;
+    }
+}
+
+void move_snake(vector<pair<int, int>>& snake_pos,
+                vector<Item>& items,
+                int& dirY,
+                int& dirX)
+{
+    int newY = snake_pos[0].first + dirY;
+
+    int newX = snake_pos[0].second + dirX;
+
+    bool grow = false;
+
+    bool poison = false;
+
+    for (int i = 0; i < items.size(); i++)
+    {
+        if (items[i].y == newY &&
+            items[i].x == newX)
         {
-            snake_pos.pop_back();
-        }
+            if (items[i].type == GROWTH_ITEM)
+            {
+                grow = true;
+            }
 
-        if (poison && snake_pos.size() > 1)
-        {
-            snake_pos.pop_back();
+            else if (items[i].type == POISON_ITEM)
+            {
+                poison = true;
+            }
+
+            items.erase(items.begin() + i);
+
+            break;
         }
     }
+
+    snake_pos.insert(snake_pos.begin(), {newY, newX});
+
+    if (!grow)
+    {
+        snake_pos.pop_back();
+    }
+
+    if (poison && snake_pos.size() > 1)
+    {
+        snake_pos.pop_back();
+    }
+}
