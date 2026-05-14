@@ -1,4 +1,6 @@
 #include "map.h"
+#include <ctime>
+#include <cstdlib>
 
 using namespace std;
 
@@ -65,38 +67,38 @@ void fill_board(WINDOW* win,
     {
         for (int j = 0; j < MAP_SIZE; j++)
         {
-            switch(map_data[i][j])
+            switch(map_data[i][j]) //j*2 = 찌부방지
             {
                 case 0:
-                    mvwprintw(win, i, j, " ");
+                    mvwprintw(win, i, j*2, "  ");
                     break;
 
                 case 1:
-                    mvwprintw(win, i, j, "#");
+                    mvwprintw(win, i, j*2, "[]");
                     break;
 
                 case 2:
-                    mvwprintw(win, i, j, "+");
+                    mvwprintw(win, i, j*2, "##");
                     break;
 
                 case 3:
                     wattron(win, COLOR_PAIR(1));
-                    mvwprintw(win, i, j, " ");
+                    mvwprintw(win, i, j*2, "  ");
                     wattroff(win, COLOR_PAIR(1));
                     break;
 
                 case 4:
                     wattron(win, COLOR_PAIR(2));
-                    mvwprintw(win, i, j, " ");
+                    mvwprintw(win, i, j*2, "  ");
                     wattroff(win, COLOR_PAIR(2));
                     break;
 
                 case 5:
-                    mvwprintw(win, i, j, "G");
+                    mvwprintw(win, i, j*2, "GG");
                     break;
 
                 case 6:
-                    mvwprintw(win, i, j, "P");
+                    mvwprintw(win, i, j*2, "PP");
                     break;
             }
         }
