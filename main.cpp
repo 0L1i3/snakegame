@@ -33,7 +33,7 @@ int main()
 
     refresh();
 
-    gameboard = newwin(MAP_SIZE, MAP_SIZE, 0, 0);
+    gameboard = newwin(MAP_SIZE, MAP_SIZE*2, 0, 0); //찌부방지
 
     snake_pos = place_snake();
 
